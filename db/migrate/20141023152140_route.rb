@@ -6,6 +6,7 @@ class Route < ActiveRecord::Migration
       t.integer    :number_rating
       t.string     :rating
       t.integer    :height
+      t.integer    :pitches
       t.string     :fa
       t.text       :route_description
       t.text       :location_description

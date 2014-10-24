@@ -14,6 +14,5 @@ class MountainProject
     end
   end
 end
-# page_data.search('table#leftNavRoutes')
+# page_data.search('table#leftNavRoutes'): gets the nav bar for routes on each wall's page
 
-MountainProject.scrape_some_shit('a_link.txt', "table#leftNavRoutes", 'text.txt')
