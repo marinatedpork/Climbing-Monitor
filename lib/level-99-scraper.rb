@@ -44,7 +44,20 @@ class Scraper
   end
 
   def return_route_type
-    page_data.search('div.rspCol table').text
+    p page_data.methods.sort
+    p page_data.search('div.rspCol table td').text
+    p page_data.search('div.rspCol table td').text
   end
 
 end
+
+p Scraper.new('http://mountainproject.com/v/paper-or-plastic/106960952').return_route_type
+
+
+'ype'
+
+
+
+
+
+
