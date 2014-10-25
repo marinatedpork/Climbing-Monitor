@@ -14,5 +14,3 @@ class MountainProject
     end
   end
 end
-# page_data.search('table#leftNavRoutes'): gets the nav bar for routes on each wall's page
-
