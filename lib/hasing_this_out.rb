@@ -1,17 +1,17 @@
-# gets the space class
+require_relative 'level-99-scraper'
 
-s = Scraper.new('http://mountainproject.com/v/soft-n-pretty/106079464', 'span.rateYDS').page_data.xpath('text()')
+s = Scraper.new('http://www.mountainproject.com/v/too-many-video-games/109335019')
+puts s.return_route_name
+puts s.route_type
+puts s.route_rating
+puts s.route_rating_as_int
+puts s.pitches
+puts s.height_or_nil
 
-
-
-s = Scraper.new('http://mountainproject.com/v/paper-or-plastic/106960952', 'span.rateYDS').page_data.xpath('text()')
-
-def return_rating(nodes)
-  if page_data.search('span.rateYDS').xpath('text()').empty?
-    ratings = page_data.search('span.rateHueco').xpath('text()').delete_if? { |node| node.blank?}
-    return ratings[0]
-  end
-  page_data.search('span.rateYDS').xpath('text()').empty?
-  ratings = page_data.search('span.rateHueco').xpath('text()').delete_if? { |node| node.blank?}
-  return ratings[0]
-end
+# d =Scraper.new('http://www.mountainproject.com/v/epinephrine/105732422')
+# puts d.return_route_name
+# puts d.route_type
+# puts d.route_rating
+# puts d.route_rating_as_int
+# puts d.pitches
+# puts d.height_or_nil
