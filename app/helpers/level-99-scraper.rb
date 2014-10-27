@@ -8,7 +8,7 @@ class Scraper
   def initialize(url)
     @url = url
     @page_data = fetch!
-    @data_array = return_route_stats
+    @data_array = route_stats
   end
 
   def fetch!
@@ -91,7 +91,9 @@ class Scraper
       return "mixed"
     elsif stats.include?("sport")
       return "sport"
-    elsif stats.include?("trad" || "tr")
+    elsif stats.include?("trad")
+      return "trad"
+    elsif stats.include?("tr")
       return "trad"
     else
       return "ice"
@@ -105,18 +107,22 @@ class Scraper
 
   def height_or_nil
     heigh_or_nil = data_array.drop_while { |item| !is_int(item) }
-    return heigh_or_nil.compact[0]
+    if heigh_or_nil.compact[0]
+      return heigh_or_nil.compact[0].to_i
+    else
+      return nil
+    end
   end
 
   def is_int(item)
-    item.split('').all? { |thing| thing =~ /\d/}
+    item.split('').all? { |thing| thing =~ /\d/ }
   end
 
-  def return_route_name
+  def route_name
     page_data.search('h1.dkorange').text[0..-2]
   end
 
-  def return_route_stats
+  def route_stats
     # Grabs table into string from TYPE to SUBMITTED
     info_string = page_data.search('div.rspCol span table td').text
     # Figures out where we need to slice it so that we can start dealing with a smaller string that has what we want

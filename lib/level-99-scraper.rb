@@ -107,7 +107,11 @@ class Scraper
 
   def height_or_nil
     heigh_or_nil = data_array.drop_while { |item| !is_int(item) }
-    return heigh_or_nil.compact[0]
+    if heigh_or_nil.compact[0]
+      return heigh_or_nil.compact[0].to_i
+    else
+      return nil
+    end
   end
 
   def is_int(item)
@@ -132,7 +136,7 @@ class Scraper
       stat_array[0] = stat_array[0].slice(6..-1)
       return stat_array.map(&:strip)
     else
-      return reverse_stat_string.reverse.slice(6..-1).chop
+      return [reverse_stat_string.reverse.slice(6..-1).chop]
     end
   end
 end

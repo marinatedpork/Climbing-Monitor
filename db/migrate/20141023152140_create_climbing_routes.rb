@@ -1,4 +1,4 @@
-class CreateRoutes < ActiveRecord::Migration
+class CreateClimbingRoutes < ActiveRecord::Migration
   def change
     create_table   :routes do |t|
       t.string     :name
@@ -6,7 +6,7 @@ class CreateRoutes < ActiveRecord::Migration
       t.string     :rating
       t.integer    :number_rating
       t.integer    :height
-      t.integer    :pitches
+      t.string     :pitches
       t.string     :url
       t.belongs_to :wall
       t.timestamps
