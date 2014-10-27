@@ -34,49 +34,53 @@ class Scraper
     has_no_YDS_class = page_data.search('span.rateYDS').xpath('text()').empty?
     has_no_Hueco_class = page_data.search('span.rateHueco').xpath('text()').empty?
     if [has_no_Hueco_class, has_no_YDS_class].all?
-      return page_data.search('div.rspCol span h3').text.split(' ')[0].encode!('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
+      return nil_or_encoded(page_data.search('div.rspCol span h3').text.split(' ')[0])
     elsif has_no_Hueco_class
       ratings = page_data.search('span.rateYDS').xpath('text()').to_a.delete_if { |node| node.blank? }
       rating_string = ratings[0].text.to_s
-      return rating_string[1..-1].encode!('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
+      return nil_or_encoded(rating_string[1..-1])
     else
       ratings = page_data.search('span.rateHueco').xpath('text()').to_a.delete_if { |node| node.blank? }
       rating_string = ratings[0].text.to_s
-      return rating_string[1..-1].encode!('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
+      return nil_or_encoded(rating_string[1..-1])
     end
   end
 
   def route_rating_as_int
     p rating = route_rating
-    if rating =~ /\./ # YDS
-      if rating.length == 3 # 5.8
-        return rating[2].to_i
-      elsif (rating.length == 4) && (rating[4] =~ /\D/) # 5.9+
-        return rating[3].to_i
-      else (rating.length >= 4) && (rating[4] =~ /\d/) # 5.10, 5.11b, 5,13+
-        return rating[2..3].to_i
-      end
-    elsif rating =~ /[(ai)(wi)]/i # Alpine or Water Ice
-      if rating.length <= 4
-        return rating[2].to_i # AI3+, WI5+
-      else
-        return rating[2].to_f + (".5").to_f # AI4-5, WI4-5
-      end
-    elsif rating =~ /v/i # Boulder route, Hueco scale
-      if (rating.length == 3) && !(rating[2] =~ /\D/)
-        return rating[1..2].to_i # V14
-      elsif rating.length == 4
-        return rating[1].to_f + (".5").to_f # V1-2
-      elsif rating.length > 4
-        return rating[1..2].to_f + (".5").to_f # V10-11
-      else
-        return rating[1].to_i # V4, V4+
-      end
-    else # Mixed route
-      if rating.length == 2 # M2
-        return rating[1].to_i
-      else
-        return rating[1].to_f + (".5").to_f
+    if rating.nil?
+      return nil
+    else
+      if rating =~ /\./ # YDS
+        if rating.length == 3 # 5.8
+          return rating[2].to_i
+        elsif (rating.length == 4) && (rating[4] =~ /\D/) # 5.9+
+          return rating[3].to_i
+        else (rating.length >= 4) && (rating[4] =~ /\d/) # 5.10, 5.11b, 5,13+
+          return rating[2..3].to_i
+        end
+      elsif rating =~ /[(ai)(wi)]/i # Alpine or Water Ice
+        if rating.length <= 4
+          return rating[2].to_i # AI3+, WI5+
+        else
+          return rating[2].to_f + (".5").to_f # AI4-5, WI4-5
+        end
+      elsif rating =~ /v/i # Boulder route, Hueco scale
+        if (rating.length == 3) && !(rating[2] =~ /\D/)
+          return rating[1..2].to_i # V14
+        elsif rating.length == 4
+          return rating[1].to_f + (".5").to_f # V1-2
+        elsif rating.length > 4
+          return rating[1..2].to_f + (".5").to_f # V10-11
+        else
+          return rating[1].to_i # V4, V4+
+        end
+      else # Mixed route
+        if rating.length == 2 # M2
+          return rating[1].to_i
+        else
+          return rating[1].to_f + (".5").to_f
+        end
       end
     end
   end
@@ -119,7 +123,8 @@ class Scraper
   end
 
   def route_name
-    page_data.search('h1.dkorange').text[0..-2].encode!('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
+    name = page_data.search('h1.dkorange').text[0..-2]
+    return nil_or_encoded(name)
   end
 
   def route_stats
@@ -145,4 +150,13 @@ class Scraper
       return [reverse_stat_string.reverse.slice(5..-1).chop]
     end
   end
+
+  private
+    def nil_or_encoded(string)
+      if string.nil?
+        return nil
+      else
+        return string.encode!('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
+      end
+    end
 end
