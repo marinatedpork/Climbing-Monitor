@@ -8,7 +8,7 @@ class Scraper
   def initialize(url)
     @url = url
     @page_data = fetch!
-    @data_array = route_stats
+    p @data_array = route_stats
   end
 
   def fetch!
@@ -34,20 +34,20 @@ class Scraper
     has_no_YDS_class = page_data.search('span.rateYDS').xpath('text()').empty?
     has_no_Hueco_class = page_data.search('span.rateHueco').xpath('text()').empty?
     if [has_no_Hueco_class, has_no_YDS_class].all?
-      return page_data.search('div.rspCol span h3').text.split(' ')[0]
+      return page_data.search('div.rspCol span h3').text.split(' ')[0].encode!('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
     elsif has_no_Hueco_class
       ratings = page_data.search('span.rateYDS').xpath('text()').to_a.delete_if { |node| node.blank? }
       rating_string = ratings[0].text.to_s
-      return rating_string[1..-1]
+      return rating_string[1..-1].encode!('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
     else
       ratings = page_data.search('span.rateHueco').xpath('text()').to_a.delete_if { |node| node.blank? }
       rating_string = ratings[0].text.to_s
-      return rating_string[1..-1]
+      return rating_string[1..-1].encode!('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
     end
   end
 
   def route_rating_as_int
-    rating = route_rating
+    p rating = route_rating
     if rating =~ /\./ # YDS
       if rating.length == 3 # 5.8
         return rating[2].to_i
@@ -119,24 +119,30 @@ class Scraper
   end
 
   def route_name
-    page_data.search('h1.dkorange').text[0..-2]
+    page_data.search('h1.dkorange').text[0..-2].encode!('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
   end
 
   def route_stats
     # Grabs table into string from TYPE to SUBMITTED
-    info_string = page_data.search('div.rspCol span table td').text
+    p info_string = page_data.search('div.rspCol span table td').text.encode!('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
     # Figures out where we need to slice it so that we can start dealing with a smaller string that has what we want
-    slice_index = info_string =~ /consensus/i
-    reverse_stat_string = info_string.slice(0..slice_index).reverse
+    p slice_index = info_string =~ /consensus/i
+      if slice_index.nil?
+        slice_index = info_string =~ /fa/i
+        if slice_index.nil?
+          slice_index = info_string =~ /page views/i
+        end
+      end
+    p reverse_stat_string = info_string.slice(0..slice_index).reverse
     if reverse_stat_string =~ /[',]/ # <---- such a hot RegExp, I call that one the Yin Yang
-      substring_string_slice_index = (reverse_stat_string =~ /[',]/) + 1
+      p substring_string_slice_index = (reverse_stat_string =~ /[',]/) + 1
       # Splits up string and cleans it
-      stat_array = reverse_stat_string.slice(substring_string_slice_index..-1).reverse.split(/,/)
+      p stat_array = reverse_stat_string.slice(substring_string_slice_index..-1).reverse.split(/,/)
       stat_array[-1] = stat_array[-1].delete "'"
-      stat_array[0] = stat_array[0].slice(6..-1)
+      stat_array[0] = stat_array[0].slice(5..-1)
       return stat_array.map(&:strip)
     else
-      return [reverse_stat_string.reverse.slice(6..-1).chop]
+      return [reverse_stat_string.reverse.slice(5..-1).chop]
     end
   end
 end
